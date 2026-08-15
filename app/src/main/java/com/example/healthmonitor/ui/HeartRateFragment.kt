@@ -16,6 +16,7 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import com.example.healthmonitor.MainActivity
 import com.example.healthmonitor.R
 import com.example.healthmonitor.camera.HeartRateAnalyzer
 import com.example.healthmonitor.data.TargetsCalculator
@@ -92,9 +93,8 @@ class HeartRateFragment : Fragment() {
         future.addListener({
             val provider = future.get()
 
-            val preview = Preview.Builder().build().also {
-                it.surfaceProvider = binding.previewView.surfaceProvider
-            }
+            val preview = Preview.Builder().build()
+            preview.setSurfaceProvider(binding.previewView.surfaceProvider)
 
             val analysis = ImageAnalysis.Builder()
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
@@ -111,7 +111,7 @@ class HeartRateFragment : Fragment() {
                     analysis
                 )
                 cameraReady = true
-                if (camera?.hasFlash() == false) {
+                if (camera?.cameraInfo?.hasFlashUnit() == false) {
                     requireActivity().runOnUiThread {
                         binding.textStatus.setText(R.string.no_flash)
                     }

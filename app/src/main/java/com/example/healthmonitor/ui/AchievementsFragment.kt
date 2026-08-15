@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.example.healthmonitor.MainActivity
 import com.example.healthmonitor.R
 import com.example.healthmonitor.data.Achievements
 import com.example.healthmonitor.databinding.FragmentAchievementsBinding
