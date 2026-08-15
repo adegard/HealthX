@@ -108,11 +108,10 @@ class StepTracker(
     }
 
     private fun handleAccelerometer(event: SensorEvent) {
-        val mag = sqrt(
-            event.values[0] * event.values[0] +
-                event.values[1] * event.values[1] +
-                event.values[2] * event.values[2]
-        )
+        val x = event.values[0].toDouble()
+        val y = event.values[1].toDouble()
+        val z = event.values[2].toDouble()
+        val mag = sqrt(x * x + y * y + z * z)
         if (filteredMag == 0.0) filteredMag = mag
         filteredMag = 0.8 * filteredMag + 0.2 * mag
 
