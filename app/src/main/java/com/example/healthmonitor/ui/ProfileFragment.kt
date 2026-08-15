@@ -1,11 +1,13 @@
 package com.example.healthmonitor.ui
 
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import com.example.healthmonitor.MainActivity
 import com.example.healthmonitor.R
@@ -13,6 +15,8 @@ import com.example.healthmonitor.data.ProfileStore
 import com.example.healthmonitor.data.TargetsCalculator
 import com.example.healthmonitor.data.UserProfile
 import com.example.healthmonitor.databinding.FragmentProfileBinding
+import java.io.File
+import java.time.LocalDate
 import java.util.Locale
 
 class ProfileFragment : Fragment() {
@@ -21,6 +25,18 @@ class ProfileFragment : Fragment() {
     private val binding get() = _binding!!
     private val main get() = requireActivity() as MainActivity
     private lateinit var store: ProfileStore
+
+    private val exportLauncher = registerForActivityResult(
+        ActivityResultContracts.CreateDocument("application/octet-stream")
+    ) { uri ->
+        if (uri != null) exportBackup(uri)
+    }
+
+    private val importLauncher = registerForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        if (uri != null) importBackup(uri)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -52,6 +68,12 @@ class ProfileFragment : Fragment() {
         }
 
         binding.btnSave.setOnClickListener { save() }
+        binding.btnExport.setOnClickListener {
+            exportLauncher.launch("HealthMonitor_backup_${LocalDate.now()}.db")
+        }
+        binding.btnImport.setOnClickListener {
+            importLauncher.launch(arrayOf("*/*"))
+        }
         loadProfile()
     }
 
@@ -99,6 +121,34 @@ class ProfileFragment : Fragment() {
             bmi,
             zones.joinToString("\n") { (name, range) -> "$name: ${range.first}-${range.last} bpm" }
         )
+    }
+
+    private fun exportBackup(uri: Uri) {
+        val temp = File(requireContext().cacheDir, "backup_export.db")
+        try {
+            main.statsStore.backupTo(temp)
+            requireContext().contentResolver.openOutputStream(uri)?.use { out ->
+                temp.inputStream().use { input -> input.copyTo(out) }
+            }
+            Toast.makeText(requireContext(), R.string.backup_exported, Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            Toast.makeText(requireContext(), R.string.backup_export_failed, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun importBackup(uri: Uri) {
+        val temp = File(requireContext().cacheDir, "backup_import.db")
+        try {
+            requireContext().contentResolver.openInputStream(uri)?.use { input ->
+                temp.outputStream().use { output -> input.copyTo(output) }
+            }
+            main.statsStore.restoreFrom(temp)
+            main.stepTracker.start()
+            loadProfile()
+            Toast.makeText(requireContext(), R.string.backup_restored, Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            Toast.makeText(requireContext(), R.string.backup_restore_failed, Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun onDestroyView() {

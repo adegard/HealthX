@@ -1,49 +1,35 @@
 package com.example.healthmonitor.data
 
-import android.content.Context
+import java.io.File
 import java.time.LocalDate
 
-class StatsStore(context: Context) {
-
-    private val prefs = context.getSharedPreferences("stats", Context.MODE_PRIVATE)
+class StatsStore(private val db: HealthDatabase) {
 
     fun todayKey(): String = LocalDate.now().toString()
 
-    fun getStepsFor(dateKey: String): Long = prefs.getLong("steps_$dateKey", 0)
+    fun getStepsFor(dateKey: String): Long = db.getSteps(dateKey)
 
-    fun saveSteps(dateKey: String, steps: Long) {
-        prefs.edit().putLong("steps_$dateKey", steps).apply()
-    }
+    fun saveSteps(dateKey: String, steps: Long) = db.upsertSteps(dateKey, steps)
 
-    fun getEarnedAchievements(): Set<String> =
-        prefs.getStringSet("achievements", emptySet()) ?: emptySet()
+    fun getHistory(limit: Int): List<DailyStat> = db.getHistory(limit)
 
-    fun earnAchievement(id: String) {
-        val current = getEarnedAchievements().toMutableSet()
-        if (current.add(id)) {
-            prefs.edit().putStringSet("achievements", current).apply()
-        }
-    }
+    fun lastHeartRate(): Int = db.getLastHeartRate()
 
-    fun getDaysActive(): Set<String> =
-        prefs.getStringSet("days_active", emptySet()) ?: emptySet()
+    fun saveHeartRate(hr: Int) = db.recordHeartRate(todayKey(), hr)
 
-    fun markActive(dateKey: String) {
-        val current = getDaysActive().toMutableSet()
-        if (current.add(dateKey)) {
-            prefs.edit().putStringSet("days_active", current).apply()
-        }
-    }
+    fun addHeartRateSession() {}
 
-    fun lastHeartRate(): Int = prefs.getInt("last_hr", 0)
+    fun heartRateSessions(): Int = db.getHeartRateSessions(todayKey())
 
-    fun saveHeartRate(hr: Int) {
-        prefs.edit().putInt("last_hr", hr).apply()
-    }
+    fun getEarnedAchievements(): Set<String> = db.getAchievements()
 
-    fun heartRateSessions(): Int = prefs.getInt("hr_sessions", 0)
+    fun earnAchievement(id: String) = db.earnAchievement(id)
 
-    fun addHeartRateSession() {
-        prefs.edit().putInt("hr_sessions", prefs.getInt("hr_sessions", 0) + 1).apply()
-    }
+    fun getDaysActive(): Set<String> = db.getDaysActive()
+
+    fun markActive(dateKey: String) {}
+
+    fun backupTo(file: File) = db.backupTo(file)
+
+    fun restoreFrom(file: File) = db.restoreFrom(file)
 }

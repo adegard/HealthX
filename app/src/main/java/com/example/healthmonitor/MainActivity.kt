@@ -11,15 +11,18 @@ import androidx.fragment.app.Fragment
 import com.example.healthmonitor.data.ProfileStore
 import com.example.healthmonitor.data.StatsStore
 import com.example.healthmonitor.databinding.ActivityMainBinding
+import com.example.healthmonitor.sensor.StepService
 import com.example.healthmonitor.sensor.StepTracker
 import com.example.healthmonitor.ui.AchievementsFragment
 import com.example.healthmonitor.ui.DashboardFragment
 import com.example.healthmonitor.ui.HeartRateFragment
+import com.example.healthmonitor.ui.HistoryFragment
 import com.example.healthmonitor.ui.ProfileFragment
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private val app get() = application as HealthApp
 
     lateinit var profileStore: ProfileStore
         private set
@@ -41,10 +44,11 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        profileStore = ProfileStore(this)
-        statsStore = StatsStore(this)
-        stepTracker = StepTracker(this, statsStore)
+        profileStore = app.profileStore
+        statsStore = app.statsStore
+        stepTracker = app.stepTracker
         stepTracker.start()
+        StepService.start(this)
 
         requestPermissionsIfNeeded()
 
@@ -52,6 +56,7 @@ class MainActivity : AppCompatActivity() {
             when (item.itemId) {
                 R.id.nav_dashboard -> showFragment(DashboardFragment())
                 R.id.nav_heart -> showFragment(HeartRateFragment())
+                R.id.nav_history -> showFragment(HistoryFragment())
                 R.id.nav_achievements -> showFragment(AchievementsFragment())
                 R.id.nav_profile -> showFragment(ProfileFragment())
                 else -> {}
@@ -74,6 +79,12 @@ class MainActivity : AppCompatActivity() {
         ) {
             needed.add(Manifest.permission.ACTIVITY_RECOGNITION)
         }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) !=
+            PackageManager.PERMISSION_GRANTED
+        ) {
+            needed.add(Manifest.permission.POST_NOTIFICATIONS)
+        }
         if (needed.isNotEmpty()) {
             permissionLauncher.launch(needed.toTypedArray())
         }
@@ -88,7 +99,6 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         if (this::stepTracker.isInitialized) {
             stepTracker.flush()
-            stepTracker.stop()
         }
         super.onDestroy()
     }

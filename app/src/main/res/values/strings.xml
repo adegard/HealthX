@@ -4,8 +4,19 @@
 
     <string name="nav_dashboard">Home</string>
     <string name="nav_heart">Heart Rate</string>
+    <string name="nav_history">History</string>
     <string name="nav_achievements">Awards</string>
     <string name="nav_profile">Profile</string>
+
+    <string name="streak_label">Current streak: %1$d days</string>
+
+    <string name="history_title">History</string>
+    <string name="history_summary">%1$d days tracked · %2$d total steps · best %3$d</string>
+    <string name="history_empty">No data yet. Start moving and check back tomorrow.</string>
+    <string name="history_last_days">Last %1$d days</string>
+    <string name="history_steps">%1$d steps</string>
+    <string name="history_distance">%.1f km</string>
+    <string name="history_heart">%1$d bpm</string>
 
     <string name="steps_today">steps today</string>
     <string name="sensor_step_counter">Sensor: built-in step counter</string>
@@ -49,6 +60,19 @@
     <string name="save">Save</string>
     <string name="saved">Profile saved</string>
     <string name="targets_preview">Targets preview</string>
+
+    <string name="backup_title">Backup</string>
+    <string name="backup_hint">Export your history to a file to keep it safe or move it to another device. Restore re-imports it.</string>
+    <string name="btn_export_backup">Export backup</string>
+    <string name="btn_import_backup">Restore from backup</string>
+    <string name="backup_exported">Backup exported</string>
+    <string name="backup_export_failed">Export failed</string>
+    <string name="backup_restored">Backup restored</string>
+    <string name="backup_restore_failed">Restore failed</string>
+
+    <string name="notif_channel_name">Step tracking</string>
+    <string name="notif_title">Health Monitor is tracking your steps</string>
+    <string name="notif_text">Tap to open</string>
 
     <string-array name="sex_options">
         <item>Male</item>

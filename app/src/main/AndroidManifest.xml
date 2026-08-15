@@ -3,6 +3,9 @@
 
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SENSOR" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <uses-feature
         android:name="android.hardware.camera"
@@ -18,6 +21,7 @@
         android:required="false" />
 
     <application
+        android:name=".HealthApp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -34,6 +38,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service
+            android:name=".sensor.StepService"
+            android:exported="false"
+            android:foregroundServiceType="sensor" />
     </application>
 
 </manifest>

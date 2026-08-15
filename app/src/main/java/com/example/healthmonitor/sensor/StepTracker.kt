@@ -46,6 +46,9 @@ class StepTracker(
     val usesStepCounterSensor: Boolean
         get() = usingStepCounter
 
+    var isRunning: Boolean = false
+        private set
+
     fun start() {
         currentDateKey = LocalDate.now().toString()
         accumulatedBeforeSession = statsStore.getStepsFor(currentDateKey)
@@ -61,25 +64,34 @@ class StepTracker(
             sessionBase = -1
             try {
                 sensorManager.registerListener(this, stepCounter, SensorManager.SENSOR_DELAY_NORMAL)
+                isRunning = true
             } catch (e: SecurityException) {
                 usingStepCounter = false
                 startAccelerometer()
+                isRunning = true
             }
         } else {
             usingStepCounter = false
             startAccelerometer()
+            isRunning = true
         }
         listener?.onSensorTypeChanged(usingStepCounter)
     }
 
     private fun startAccelerometer() {
         if (accelerometer != null) {
-            sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_GAME)
+            sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_UI)
         }
     }
 
     fun stop() {
         sensorManager.unregisterListener(this)
+        isRunning = false
+    }
+
+    fun tick() {
+        checkDayRollover()
+        flush()
     }
 
     fun flush() {

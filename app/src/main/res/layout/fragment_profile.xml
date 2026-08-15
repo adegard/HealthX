@@ -106,6 +106,41 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/backup_title"
+            android:textColor="@color/text_primary"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/backup_hint"
+            android:textColor="@color/text_secondary"
+            android:textSize="12sp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnExport"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/btn_export_backup"
+            app:cornerRadius="24dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnImport"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="@string/btn_import_backup"
+            app:cornerRadius="24dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginTop="18dp"
             android:text="@string/targets_preview"
             android:textColor="@color/text_primary"

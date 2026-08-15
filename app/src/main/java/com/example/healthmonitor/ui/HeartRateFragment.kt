@@ -19,6 +19,7 @@ import androidx.fragment.app.Fragment
 import com.example.healthmonitor.MainActivity
 import com.example.healthmonitor.R
 import com.example.healthmonitor.camera.HeartRateAnalyzer
+import com.example.healthmonitor.data.Achievements
 import com.example.healthmonitor.data.TargetsCalculator
 import com.example.healthmonitor.databinding.FragmentHeartRateBinding
 import java.util.concurrent.Executors
@@ -157,6 +158,17 @@ class HeartRateFragment : Fragment() {
             main.statsStore.addHeartRateSession()
             binding.textBpm.text = average.toString()
             binding.textConfidence.text = getString(R.string.session_average, average)
+
+            val profile = main.profileStore.load()
+            val steps = main.stepTracker.totalToday
+            Achievements.checkAndEarn(
+                main.statsStore,
+                steps,
+                TargetsCalculator.distanceKm(steps.toInt(), profile),
+                TargetsCalculator.calories(steps.toInt(), profile),
+                TargetsCalculator.bmi(profile),
+                hrRead = true
+            )
         } else {
             binding.textBpm.text = "--"
             binding.textConfidence.setText(R.string.no_reading)

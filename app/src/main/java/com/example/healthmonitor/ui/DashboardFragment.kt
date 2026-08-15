@@ -91,6 +91,9 @@ class DashboardFragment : Fragment(), StepTracker.Listener {
         binding.textZones.text = zones.joinToString("\n") { (name, range) ->
             "$name: ${range.first}-${range.last} bpm"
         }
+
+        val streak = Achievements.currentStreak(main.statsStore.getDaysActive())
+        binding.textStreak.text = getString(R.string.streak_label, streak)
     }
 
     override fun onDestroyView() {
