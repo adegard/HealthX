@@ -68,6 +68,12 @@ class ProfileFragment : Fragment() {
         }
 
         binding.btnSave.setOnClickListener { save() }
+        binding.btnAdvice.setOnClickListener {
+            requireActivity().supportFragmentManager.beginTransaction()
+                .replace(R.id.fragmentContainer, AdviceFragment())
+                .addToBackStack(null)
+                .commit()
+        }
         binding.btnExport.setOnClickListener {
             exportLauncher.launch("HealthMonitor_backup_${LocalDate.now()}.db")
         }

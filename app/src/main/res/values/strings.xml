@@ -5,7 +5,6 @@
     <string name="nav_dashboard">Home</string>
     <string name="nav_heart">Heart Rate</string>
     <string name="nav_history">History</string>
-    <string name="nav_advice">Wellness</string>
     <string name="nav_achievements">Awards</string>
     <string name="nav_profile">Profile</string>
 
@@ -60,6 +59,7 @@
     <string name="custom_goal">Daily step goal (0 = automatic)</string>
     <string name="save">Save</string>
     <string name="saved">Profile saved</string>
+    <string name="btn_wellness_advice">Wellness advice</string>
     <string name="targets_preview">Targets preview</string>
 
     <string name="backup_title">Backup</string>

@@ -14,7 +14,6 @@ import com.example.healthmonitor.databinding.ActivityMainBinding
 import com.example.healthmonitor.sensor.StepService
 import com.example.healthmonitor.sensor.StepTracker
 import com.example.healthmonitor.ui.AchievementsFragment
-import com.example.healthmonitor.ui.AdviceFragment
 import com.example.healthmonitor.ui.DashboardFragment
 import com.example.healthmonitor.ui.HeartRateFragment
 import com.example.healthmonitor.ui.HistoryFragment
@@ -58,7 +57,6 @@ class MainActivity : AppCompatActivity() {
                 R.id.nav_dashboard -> showFragment(DashboardFragment())
                 R.id.nav_heart -> showFragment(HeartRateFragment())
                 R.id.nav_history -> showFragment(HistoryFragment())
-                R.id.nav_advice -> showFragment(AdviceFragment())
                 R.id.nav_achievements -> showFragment(AchievementsFragment())
                 R.id.nav_profile -> showFragment(ProfileFragment())
                 else -> {}
