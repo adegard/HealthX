@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Health Monitor</string>
+
+    <string name="nav_dashboard">Home</string>
+    <string name="nav_heart">Heart Rate</string>
+    <string name="nav_achievements">Awards</string>
+    <string name="nav_profile">Profile</string>
+
+    <string name="steps_today">steps today</string>
+    <string name="sensor_step_counter">Sensor: built-in step counter</string>
+    <string name="sensor_accelerometer">Sensor: accelerometer (fallback)</string>
+    <string name="goal_progress">Goal %1$d · %2$d done</string>
+    <string name="distance">Distance</string>
+    <string name="calories">Calories</string>
+    <string name="active_minutes">Active minutes</string>
+    <string name="minutes_value">%1$d min</string>
+    <string name="last_hr">Last heart rate</string>
+    <string name="bpm_value">%1$d bpm</string>
+    <string name="bmi">BMI</string>
+    <string name="hr_zones">Heart rate zones</string>
+    <string name="zones_hint">Your heart rate zones</string>
+
+    <string name="start">Start</string>
+    <string name="stop">Stop</string>
+    <string name="press_start">Press Start to measure</string>
+    <string name="measuring">Measuring…</string>
+    <string name="place_finger">Cover the camera with your fingertip. Keep still and press firmly.</string>
+    <string name="no_flash">No flashlight available on this device</string>
+    <string name="no_reading">No stable reading. Keep your finger still.</string>
+    <string name="camera_permission_needed">Camera permission is required</string>
+    <string name="camera_error">Could not open the camera</string>
+    <string name="confidence_pct">Confidence: %1$d%%</string>
+    <string name="session_average">Session average: %1$d bpm</string>
+    <string name="hr_disclaimer">Estimate for wellness only. Not a medical device.</string>
+    <string name="heart_rate_title">Heart rate</string>
+
+    <string name="achievements_progress">%1$d/%2$d unlocked</string>
+    <string name="achievements_title">Achievements</string>
+
+    <string name="profile_title">Profile</string>
+    <string name="name_optional">Name (optional)</string>
+    <string name="age">Age</string>
+    <string name="sex">Sex</string>
+    <string name="height_cm">Height (cm)</string>
+    <string name="weight_kg">Weight (kg)</string>
+    <string name="activity_level">Activity level</string>
+    <string name="custom_goal">Daily step goal (0 = automatic)</string>
+    <string name="save">Save</string>
+    <string name="saved">Profile saved</string>
+    <string name="targets_preview">Targets preview</string>
+
+    <string-array name="sex_options">
+        <item>Male</item>
+        <item>Female</item>
+    </string-array>
+
+    <string-array name="activity_levels">
+        <item>Sedentary</item>
+        <item>Light</item>
+        <item>Active</item>
+        <item>Very active</item>
+    </string-array>
+</resources>
