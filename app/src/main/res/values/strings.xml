@@ -5,6 +5,7 @@
     <string name="nav_dashboard">Home</string>
     <string name="nav_heart">Heart Rate</string>
     <string name="nav_history">History</string>
+    <string name="nav_advice">Wellness</string>
     <string name="nav_achievements">Awards</string>
     <string name="nav_profile">Profile</string>
 
@@ -73,6 +74,56 @@
     <string name="notif_channel_name">Step tracking</string>
     <string name="notif_title">Health Monitor is tracking your steps</string>
     <string name="notif_text">Tap to open</string>
+
+    <string name="advice_title">Wellness advice</string>
+    <string name="advice_subtitle">Small, easy habits that add up. Keep it gentle and listen to your body.</string>
+
+    <string name="sedentary_title">Sedentary reminder</string>
+    <string name="sedentary_desc">Get a gentle nudge to stand up and move when you\'ve been sitting too long.</string>
+    <string name="sedentary_interval_label">Remind me every</string>
+    <string name="sedentary_toggle_label">Enable reminders</string>
+    <string name="advice_reminder_enabled">Sedentary reminders on</string>
+    <string name="advice_reminder_disabled">Sedentary reminders off</string>
+    <string name="notif_channel_sedentary">Sedentary reminders</string>
+    <string name="reminder_notif_title">Time to move!</string>
+    <string name="reminder_notif_text">Stand up, stretch, and take a short walk.</string>
+
+    <string name="walking_title">Walking advice</string>
+    <string name="morning_title">Morning routine</string>
+    <string name="exercises_title">Gentle exercises</string>
+
+    <string-array name="sedentary_intervals">
+        <item>30 minutes</item>
+        <item>60 minutes</item>
+        <item>90 minutes</item>
+        <item>120 minutes</item>
+    </string-array>
+
+    <string-array name="walking_tips">
+        <item>Aim for a 30-minute brisk walk most days — it counts even when split into 10-minute chunks.</item>
+        <item>A short walk right after meals helps digestion and steady blood sugar.</item>
+        <item>Try to reach your daily step goal before the evening; every step adds up.</item>
+        <item>Walk with a relaxed posture: shoulders back, chin up, arms swinging gently.</item>
+        <item>Take the stairs, park a little farther away, and pace while on phone calls.</item>
+    </string-array>
+
+    <string-array name="morning_routine_items">
+        <item>Start with a glass of water before anything else.</item>
+        <item>Stand tall and do slow neck rolls and shoulder rolls, 10 each.</item>
+        <item>March in place gently for 60 seconds to wake up your legs.</item>
+        <item>Cat–cow stretch: 8 slow cycles on hands and knees.</item>
+        <item>Standing forward fold: hang relaxed for 20 seconds, then roll up slowly.</item>
+        <item>Finish with 5 slow, deep breaths in and out.</item>
+    </string-array>
+
+    <string-array name="exercise_items">
+        <item>Wall push-ups — 2 sets of 8–10. Hands on a wall, body straight, bend and straighten the elbows slowly.</item>
+        <item>Chair squats — 2 sets of 8–10. Sit onto a chair and stand back up; hold the chair back if needed.</item>
+        <item>Heel raises — 2 sets of 10. Rise onto your toes and lower slowly; hold a support for balance.</item>
+        <item>Bird-dog — 2 sets of 8 per side. Extend one arm and the opposite leg, keep your back flat, move slowly.</item>
+        <item>Seated leg raises — 2 sets of 10 per leg. Straighten one leg at a time from a chair.</item>
+        <item>Do everything at your own pace — never to the point of pain. A little every day beats a lot once a week.</item>
+    </string-array>
 
     <string-array name="sex_options">
         <item>Male</item>

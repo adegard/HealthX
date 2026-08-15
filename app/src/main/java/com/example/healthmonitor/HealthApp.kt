@@ -1,6 +1,7 @@
 package com.example.healthmonitor
 
 import android.app.Application
+import com.example.healthmonitor.advice.SedentaryReminder
 import com.example.healthmonitor.data.HealthDatabase
 import com.example.healthmonitor.data.ProfileStore
 import com.example.healthmonitor.data.StatsStore
@@ -17,6 +18,7 @@ class HealthApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        SedentaryReminder.rescheduleIfEnabled(this)
         migrateLegacyPrefs()
     }
 

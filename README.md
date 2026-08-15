@@ -15,6 +15,7 @@ A privacy-friendly Android step tracker and on-demand heart rate monitor that ru
 | Achievements | 12 badges: first steps, 1k / 5k / 10k / 20k steps, 5 km / 10 km, 500 kcal, healthy BMI, first pulse, 3-day and 7-day streaks |
 | Profile | Age, sex, height, weight, activity level, optional custom step goal; live targets preview |
 | History | Last 60 days in a scrollable list plus a 14-day bar chart, with per-day steps, distance, calories and average heart rate |
+| Wellness | Sedentary reminders (optional notifications to stand up and move), walking advice, a 5-minute morning routine and gentle no-equipment exercises for skeleton and muscle |
 | Backup | Export the whole SQLite database to a file (SAF) and restore it later or on another device |
 | Background | Foreground service keeps the step counter alive in the background and flushes data to SQLite every 30 s (battery-friendly) |
 
@@ -28,7 +29,7 @@ A privacy-friendly Android step tracker and on-demand heart rate monitor that ru
 
 - **Activity recognition** — required on Android 10+ to read the built-in step counter.
 - **Camera** — required for the heart rate measurement (also used for the torch).
-- **Notifications** — Android 13+ notification permission for the background tracking service.
+- **Notifications** — Android 13+ notification permission for the background tracking service and sedentary reminders.
 
 ## Target / build
 
@@ -61,12 +62,16 @@ app/src/main/java/com/example/healthmonitor/
 ├── sensor/
 │   ├── StepTracker.kt       # Step counter + accelerometer fallback
 │   └── StepService.kt       # Foreground service, 30 s flush tick
+├── advice/
+│   ├── SedentaryReminder.kt # Alarm scheduling for sit-less reminders
+│   └── SedentaryReminderReceiver.kt # Moves-you reminder notification
 ├── camera/
 │   └── HeartRateAnalyzer.kt # PPG frame analysis
 └── ui/
     ├── DashboardFragment.kt
     ├── HeartRateFragment.kt
     ├── HistoryFragment.kt
+    ├── AdviceFragment.kt
     ├── AchievementsFragment.kt
     ├── ProfileFragment.kt
     └── view/                # StepsBarChartView, WaveformView
