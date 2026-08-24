@@ -105,6 +105,8 @@ object SyncManager {
                 attributes
             )
 
+            importDailyStatistics(baseUrl, authToken, rows)
+
             val today = todayKey()
             app.statsStore.getUnsyncedDates(60).forEach { date ->
                 if (date != today) app.statsStore.markSynced(date)
@@ -125,6 +127,39 @@ object SyncManager {
             SyncScheduler.scheduleRetry(appContext)
         }
         return allOk
+    }
+
+    private fun importDailyStatistics(
+        baseUrl: String,
+        authToken: String,
+        rows: List<com.example.healthmonitor.data.DailyStat>
+    ) {
+        val stats = org.json.JSONArray()
+        for (row in rows) {
+            val start = java.time.ZonedDateTime.of(
+                java.time.LocalDate.parse(row.date),
+                java.time.LocalTime.MIDNIGHT,
+                java.time.ZoneId.systemDefault()
+            ).format(java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+            val entry = org.json.JSONObject()
+            entry.put("start", start)
+            entry.put("state", row.steps)
+            entry.put("sum", row.steps)
+            stats.put(entry)
+        }
+        val metadata = org.json.JSONObject().apply {
+            put("has_mean", false)
+            put("has_sum", true)
+            put("name", "HealthX steps")
+            put("source", "healthx")
+            put("statistic_id", ENTITY_ID)
+            put("unit_of_measurement", "steps")
+        }
+        val payload = org.json.JSONObject().apply {
+            put("metadata", metadata)
+            put("stats", stats)
+        }
+        HomeAssistantClient.importStatistics(baseUrl, authToken, payload)
     }
 
     private fun cleanupLegacySensors(app: HealthApp, baseUrl: String, authToken: String) {

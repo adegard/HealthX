@@ -41,6 +41,34 @@ object HomeAssistantClient {
         }
     }
 
+    fun importStatistics(
+        baseUrl: String,
+        token: String,
+        payload: JSONObject
+    ) {
+        var connection: HttpURLConnection? = null
+        try {
+            connection = URL("$baseUrl/api/services/recorder/import_statistics")
+                .openConnection() as HttpURLConnection
+            connection.requestMethod = "POST"
+            connection.connectTimeout = 10_000
+            connection.readTimeout = 10_000
+            connection.doOutput = true
+            connection.setRequestProperty("Authorization", "Bearer $token")
+            connection.setRequestProperty("Content-Type", "application/json")
+            connection.outputStream.use { out ->
+                out.write(payload.toString().toByteArray(Charsets.UTF_8))
+                out.flush()
+            }
+            val code = connection.responseCode
+            if (code !in 200..299) {
+                throw IOException("Home Assistant responded with HTTP $code")
+            }
+        } finally {
+            connection?.disconnect()
+        }
+    }
+
     fun deleteState(baseUrl: String, token: String, entityId: String) {
         var connection: HttpURLConnection? = null
         try {

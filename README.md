@@ -33,6 +33,8 @@ A privacy-friendly Android step tracker that runs entirely on the phone — no w
 
 **How it works:** shortly after midnight a daily alarm fires. If the phone is on Wi-Fi, the sensor is updated with all data that has not been sent yet (older versions created one entity per day; those are deleted automatically). If Wi-Fi is unavailable — for example you are away — the app retries every 30 minutes and catches up later, so skipped days are not lost: when you are back home each missing day appears in the history attribute under its own date.
 
+**Past days / statistics:** besides the state update, every sync also imports all days into Home Assistant's long-term statistics via `recorder.import_statistics` (`statistic_id: sensor.healthx_steps`, source `healthx`). That means past days show up immediately: check **Developer tools → Statistics**, add a **Statistics Graph** card (period: day), or open the entity's more-info dialog.
+
 ## Permissions
 
 - **Activity recognition** — required on Android 10+ to read the built-in step counter.
