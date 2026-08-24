@@ -6,6 +6,7 @@ import android.net.NetworkCapabilities
 import com.example.healthmonitor.HealthApp
 import com.example.healthmonitor.R
 import com.example.healthmonitor.data.TargetsCalculator
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -21,6 +22,7 @@ object SyncManager {
     private const val KEY_LAST_SYNC_AT = "last_sync_at"
     private const val KEY_LAST_ERROR = "last_error"
     private const val KEY_LEGACY_CLEANED = "legacy_per_day_cleaned"
+    private const val KEY_STATS_UNSUPPORTED = "stats_import_unsupported"
 
     const val ENTITY_ID = "sensor.healthx_steps"
     private const val LEGACY_PREFIX = "sensor.healthx_steps_"
@@ -107,7 +109,7 @@ object SyncManager {
 
             var warning: String? = null
             try {
-                importDailyStatistics(baseUrl, authToken, rows)
+                importDailyStatistics(appContext, baseUrl, authToken, rows)
             } catch (e: Exception) {
                 warning = appContext.getString(R.string.ha_stats_warning, e.message ?: "?")
             }
@@ -134,36 +136,74 @@ object SyncManager {
     }
 
     private fun importDailyStatistics(
+        context: Context,
         baseUrl: String,
         authToken: String,
         rows: List<com.example.healthmonitor.data.DailyStat>
     ) {
-        val stats = org.json.JSONArray()
-        for (row in rows) {
-            val start = java.time.ZonedDateTime.of(
+        if (prefs(context).getBoolean(KEY_STATS_UNSUPPORTED, false)) return
+        val startTimes = rows.map { row ->
+            java.time.ZonedDateTime.of(
                 java.time.LocalDate.parse(row.date),
                 java.time.LocalTime.MIDNIGHT,
                 java.time.ZoneId.systemDefault()
             ).format(java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+        }
+        try {
+            sendImport(baseUrl, authToken, buildPayload(startTimes, rows, modern = true))
+        } catch (e: IOException) {
+            when {
+                e.message?.contains("404") == true -> markStatsUnsupported(context, e.message ?: "not found")
+                e.message?.contains("400") == true -> {
+                    try {
+                        sendImport(baseUrl, authToken, buildPayload(startTimes, rows, modern = false))
+                    } catch (e2: Exception) {
+                        markStatsUnsupported(context, e2.message ?: e2.javaClass.simpleName)
+                    }
+                }
+                else -> throw e
+            }
+        }
+    }
+
+    private fun markStatsUnsupported(context: Context, message: String) {
+        prefs(context).edit()
+            .putBoolean(KEY_STATS_UNSUPPORTED, true)
+            .putString(KEY_LAST_ERROR, context.getString(R.string.ha_stats_warning, message))
+            .apply()
+    }
+
+    private fun sendImport(baseUrl: String, authToken: String, payload: org.json.JSONObject) {
+        HomeAssistantClient.importStatistics(baseUrl, authToken, payload)
+    }
+
+    private fun buildPayload(
+        startTimes: List<String>,
+        rows: List<com.example.healthmonitor.data.DailyStat>,
+        modern: Boolean
+    ): org.json.JSONObject {
+        val stats = org.json.JSONArray()
+        rows.forEachIndexed { index, row ->
             val entry = org.json.JSONObject()
-            entry.put("start", start)
-            entry.put("state", row.steps)
+            entry.put("start", startTimes[index])
             entry.put("sum", row.steps)
+            if (modern) entry.put("state", row.steps)
             stats.put(entry)
         }
         val metadata = org.json.JSONObject().apply {
-            put("has_mean", false)
-            put("has_sum", true)
-            put("name", "HealthX steps")
             put("source", "healthx")
             put("statistic_id", ENTITY_ID)
-            put("unit_of_measurement", "steps")
+            put("has_mean", false)
+            put("has_sum", true)
+            if (modern) {
+                put("name", "HealthX steps")
+                put("unit_of_measurement", "steps")
+            }
         }
-        val payload = org.json.JSONObject().apply {
+        return org.json.JSONObject().apply {
             put("metadata", metadata)
             put("stats", stats)
         }
-        HomeAssistantClient.importStatistics(baseUrl, authToken, payload)
     }
 
     private fun cleanupLegacySensors(app: HealthApp, baseUrl: String, authToken: String) {
