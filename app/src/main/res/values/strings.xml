@@ -71,6 +71,19 @@
     <string name="backup_restored">Backup restored</string>
     <string name="backup_restore_failed">Restore failed</string>
 
+    <string name="ha_title">Home Assistant sync</string>
+    <string name="ha_hint">Once a day (after midnight) your step history is sent to Home Assistant over your home Wi-Fi. Missed days are sent automatically when you are back home.</string>
+    <string name="ha_server_url">Server URL</string>
+    <string name="ha_token">Long-lived access token</string>
+    <string name="ha_enable_label">Enable daily sync</string>
+    <string name="ha_sync_now">Sync now</string>
+    <string name="ha_syncing">Syncing…</string>
+    <string name="ha_sync_done">Sync finished</string>
+    <string name="ha_sync_failed">Sync failed — check server URL and token</string>
+    <string name="ha_pending">Days waiting to sync: %1$d</string>
+    <string name="ha_last_sync">Last sync: %1$s</string>
+    <string name="ha_waiting_wifi">Waiting for home Wi-Fi…</string>
+
     <string name="notif_channel_name">Step tracking</string>
     <string name="notif_title">Health Monitor is tracking your steps</string>
     <string name="notif_text">Tap to open</string>

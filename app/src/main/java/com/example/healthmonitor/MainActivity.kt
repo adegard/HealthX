@@ -15,7 +15,6 @@ import com.example.healthmonitor.sensor.StepService
 import com.example.healthmonitor.sensor.StepTracker
 import com.example.healthmonitor.ui.AchievementsFragment
 import com.example.healthmonitor.ui.DashboardFragment
-import com.example.healthmonitor.ui.HeartRateFragment
 import com.example.healthmonitor.ui.HistoryFragment
 import com.example.healthmonitor.ui.ProfileFragment
 
@@ -55,7 +54,6 @@ class MainActivity : AppCompatActivity() {
         binding.bottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_dashboard -> showFragment(DashboardFragment())
-                R.id.nav_heart -> showFragment(HeartRateFragment())
                 R.id.nav_history -> showFragment(HistoryFragment())
                 R.id.nav_achievements -> showFragment(AchievementsFragment())
                 R.id.nav_profile -> showFragment(ProfileFragment())
@@ -68,11 +66,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun requestPermissionsIfNeeded() {
         val needed = mutableListOf<String>()
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) !=
-            PackageManager.PERMISSION_GRANTED
-        ) {
-            needed.add(Manifest.permission.CAMERA)
-        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q &&
             ContextCompat.checkSelfPermission(this, Manifest.permission.ACTIVITY_RECOGNITION) !=
             PackageManager.PERMISSION_GRANTED

@@ -10,7 +10,7 @@ class HealthDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
 
     companion object {
         const val DB_NAME = "health_monitor.db"
-        private const val DB_VERSION = 1
+        private const val DB_VERSION = 2
     }
 
     private val appContext = context.applicationContext
@@ -39,9 +39,22 @@ class HealthDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
                 "activity_level INTEGER NOT NULL DEFAULT 1, " +
                 "custom_goal INTEGER NOT NULL DEFAULT 0)"
         )
+        db.execSQL(
+            "CREATE TABLE sync_log (" +
+                "date TEXT PRIMARY KEY, " +
+                "synced_at INTEGER NOT NULL)"
+        )
     }
 
-    override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {}
+    override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
+        if (oldVersion < 2) {
+            db.execSQL(
+                "CREATE TABLE IF NOT EXISTS sync_log (" +
+                    "date TEXT PRIMARY KEY, " +
+                    "synced_at INTEGER NOT NULL)"
+            )
+        }
+    }
 
     @Synchronized
     fun getSteps(dateKey: String): Long {
@@ -115,6 +128,43 @@ class HealthDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
             while (c.moveToNext()) out.add(c.getString(0))
         }
         return out
+    }
+
+    @Synchronized
+    fun getUnsyncedDates(limit: Int): List<String> {
+        val out = mutableListOf<String>()
+        readableDatabase.rawQuery(
+            "SELECT d.date FROM daily_stats d " +
+                "LEFT JOIN sync_log s ON d.date = s.date " +
+                "WHERE s.date IS NULL ORDER BY d.date ASC LIMIT ?",
+            arrayOf(limit.toString())
+        ).use { c ->
+            while (c.moveToNext()) out.add(c.getString(0))
+        }
+        return out
+    }
+
+    @Synchronized
+    fun countUnsynced(): Int {
+        readableDatabase.rawQuery(
+            "SELECT COUNT(*) FROM daily_stats d " +
+                "LEFT JOIN sync_log s ON d.date = s.date WHERE s.date IS NULL",
+            null
+        ).use { c ->
+            return if (c.moveToFirst()) c.getInt(0) else 0
+        }
+    }
+
+    @Synchronized
+    fun markSynced(dateKey: String) {
+        writableDatabase.insertWithOnConflict(
+            "sync_log", null,
+            ContentValues().apply {
+                put("date", dateKey)
+                put("synced_at", System.currentTimeMillis())
+            },
+            SQLiteDatabase.CONFLICT_REPLACE
+        )
     }
 
     @Synchronized

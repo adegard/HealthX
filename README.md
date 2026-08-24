@@ -1,23 +1,23 @@
 # Health Monitor
 
-A privacy-friendly Android step tracker and on-demand heart rate monitor that runs entirely on the phone — no watch, no account, no cloud.
+A privacy-friendly Android step tracker that runs entirely on the phone — no watch, no account, no cloud (optional self-hosted Home Assistant sync).
 
 - **Steps** are counted from the phone's own hardware: the built-in `TYPE_STEP_COUNTER`, with an accelerometer peak-detector fallback on devices that lack one. It never reads steps from a watch.
-- **Heart rate** is measured *on request* by covering the back camera with a fingertip. The flashlight (torch) lights the fingertip and the app analyses the red channel of the camera frames (photoplethysmography). This is a wellness estimate only — not a medical device.
-- **Targets & achievements** are computed from age, sex, height, weight and activity level: daily step goal, stride length, distance, calories, BMI, max heart rate (208 − 0.7 × age) and heart rate zones. 12 badges are awarded automatically.
+- **Targets & achievements** are computed from age, sex, height, weight and activity level: daily step goal, stride length, distance, calories, BMI, max heart rate (208 − 0.7 × age) and heart rate zones.
+- **Home Assistant sync** (optional) pushes each day's progress to your own Home Assistant instance once per day over your home Wi-Fi.
 
 ## Features
 
 | Area | Details |
 | --- | --- |
-| Dashboard | Today's steps, goal progress, distance, calories, active minutes, last heart rate, BMI, HR zones, current streak |
-| Heart rate | Camera + torch PPG measurement with live waveform, session average and confidence; wellness-only disclaimer |
-| Achievements | 12 badges: first steps, 1k / 5k / 10k / 20k steps, 5 km / 10 km, 500 kcal, healthy BMI, first pulse, 3-day and 7-day streaks |
+| Dashboard | Today's steps, goal progress, distance, calories, active minutes, BMI, HR zones, current streak |
+| Achievements | 11 badges: first steps, 1k / 5k / 10k / 20k steps, 5 km / 10 km, 500 kcal, healthy BMI, 3-day and 7-day streaks |
 | Profile | Age, sex, height, weight, activity level, optional custom step goal; live targets preview |
-| History | Last 60 days in a scrollable list plus a 14-day bar chart, with per-day steps, distance, calories and average heart rate |
+| History | Last 60 days in a scrollable list plus a 14-day bar chart, with per-day steps, distance and calories |
 | Wellness | Sedentary reminders (optional notifications to stand up and move), walking advice, a 5-minute morning routine and gentle no-equipment exercises for skeleton and muscle |
 | Backup | Export the whole SQLite database to a file (SAF) and restore it later or on another device |
 | Background | Foreground service keeps the step counter alive in the background and flushes data to SQLite every 30 s (battery-friendly) |
+| Home Assistant | Daily push of each day's steps/distance/calories as `sensor.healthx_steps_YYYY_MM_DD`; retries while away and catches up on missed days |
 
 ## Data & privacy
 
@@ -25,11 +25,19 @@ A privacy-friendly Android step tracker and on-demand heart rate monitor that ru
 - No network calls, no analytics, no ads, no account.
 - You can export/restore the database yourself via the Profile tab.
 
+## Home Assistant sync
+
+1. In Home Assistant, click your username → **Security** → **Long-lived access tokens** → **Create token** and copy it.
+2. In the app: **Profile → Home Assistant sync**, enter your server URL (e.g. `http://192.168.8.17:8123`) and the token, then enable the switch.
+3. The app creates/updates one entity per day, e.g. `sensor.healthx_steps_2026_08_24`, with the step count as state and `distance_km` / `calories` / `date` as attributes.
+
+**How it works:** shortly after midnight a daily alarm fires. If the phone is on Wi-Fi, every day that has not been synced yet is sent to Home Assistant (one entity per day). If Wi-Fi is unavailable — for example you are away — the app retries every 30 minutes and catches up later, so skipped days are not lost: when you are back home each missing day is registered separately under its own date.
+
 ## Permissions
 
 - **Activity recognition** — required on Android 10+ to read the built-in step counter.
-- **Camera** — required for the heart rate measurement (also used for the torch).
 - **Notifications** — Android 13+ notification permission for the background tracking service and sedentary reminders.
+- **Internet / network state** — only used for the optional Home Assistant sync on your local network.
 
 ## Target / build
 
@@ -65,16 +73,19 @@ app/src/main/java/com/example/healthmonitor/
 ├── advice/
 │   ├── SedentaryReminder.kt # Alarm scheduling for sit-less reminders
 │   └── SedentaryReminderReceiver.kt # Moves-you reminder notification
-├── camera/
-│   └── HeartRateAnalyzer.kt # PPG frame analysis
+├── sync/
+│   ├── SyncManager.kt       # Catch-up logic: sends every unsynced day over Wi-Fi
+│   ├── SyncScheduler.kt     # Daily ~00:15 alarm + retry alarm
+│   ├── DailySyncReceiver.kt # Fires the sync from alarms
+│   ├── BootReceiver.kt      # Re-arms alarms after reboot
+│   └── HomeAssistantClient.kt # REST POST /api/states/<entity>
 └── ui/
     ├── DashboardFragment.kt
-    ├── HeartRateFragment.kt
     ├── HistoryFragment.kt
     ├── AdviceFragment.kt
     ├── AchievementsFragment.kt
     ├── ProfileFragment.kt
-    └── view/                # StepsBarChartView, WaveformView
+    └── view/                # StepsBarChartView
 ```
 
 ## Disclaimer

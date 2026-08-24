@@ -13,14 +13,6 @@ class StatsStore(private val db: HealthDatabase) {
 
     fun getHistory(limit: Int): List<DailyStat> = db.getHistory(limit)
 
-    fun lastHeartRate(): Int = db.getLastHeartRate()
-
-    fun saveHeartRate(hr: Int) = db.recordHeartRate(todayKey(), hr)
-
-    fun addHeartRateSession() {}
-
-    fun heartRateSessions(): Int = db.getHeartRateSessions(todayKey())
-
     fun getEarnedAchievements(): Set<String> = db.getAchievements()
 
     fun earnAchievement(id: String) = db.earnAchievement(id)
@@ -32,4 +24,10 @@ class StatsStore(private val db: HealthDatabase) {
     fun backupTo(file: File) = db.backupTo(file)
 
     fun restoreFrom(file: File) = db.restoreFrom(file)
+
+    fun getUnsyncedDates(limit: Int): List<String> = db.getUnsyncedDates(limit)
+
+    fun countUnsynced(): Int = db.countUnsynced()
+
+    fun markSynced(dateKey: String) = db.markSynced(dateKey)
 }

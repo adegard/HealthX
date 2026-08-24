@@ -20,7 +20,6 @@ object Achievements {
         Achievement("distance_10k", "10 km Explorer", "Walk 10 km in a day"),
         Achievement("calories_500", "Calorie Burner", "Burn 500 kcal in a day"),
         Achievement("bmi_normal", "Healthy Range", "Have a BMI between 18.5 and 25"),
-        Achievement("heart_check", "First Pulse", "Complete a heart rate measurement"),
         Achievement("streak_3", "3-Day Streak", "Be active 3 days in a row"),
         Achievement("streak_7", "7-Day Streak", "Be active 7 days in a row")
     )
@@ -40,8 +39,7 @@ object Achievements {
         todaySteps: Long,
         distanceKm: Double,
         calories: Double,
-        bmi: Double,
-        hrRead: Boolean
+        bmi: Double
     ) {
         val earned = statsStore.getEarnedAchievements()
         val streak = currentStreak(statsStore.getDaysActive())
@@ -59,7 +57,6 @@ object Achievements {
         if (distanceKm >= 10.0) earn("distance_10k")
         if (calories >= 500.0) earn("calories_500")
         if (bmi in 18.5..25.0) earn("bmi_normal")
-        if (hrRead) earn("heart_check")
         if (streak >= 3) earn("streak_3")
         if (streak >= 7) earn("streak_7")
     }

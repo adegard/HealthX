@@ -15,6 +15,7 @@ import com.example.healthmonitor.data.ProfileStore
 import com.example.healthmonitor.data.TargetsCalculator
 import com.example.healthmonitor.data.UserProfile
 import com.example.healthmonitor.databinding.FragmentProfileBinding
+import com.example.healthmonitor.sync.SyncManager
 import java.io.File
 import java.time.LocalDate
 import java.util.Locale
@@ -80,7 +81,43 @@ class ProfileFragment : Fragment() {
         binding.btnImport.setOnClickListener {
             importLauncher.launch(arrayOf("*/*"))
         }
+        binding.edtHaUrl.setText(SyncManager.url(requireContext()))
+        binding.edtHaToken.setText(SyncManager.token(requireContext()))
+        binding.switchHa.isChecked = SyncManager.isEnabled(requireContext())
+        binding.switchHa.setOnCheckedChangeListener { _, _ -> saveHaSettings() }
+        binding.btnHaSyncNow.setOnClickListener {
+            saveHaSettings()
+            Toast.makeText(requireContext(), R.string.ha_syncing, Toast.LENGTH_SHORT).show()
+            val appContext = requireContext().applicationContext
+            Thread {
+                val ok = SyncManager.syncNow(appContext)
+                if (isAdded()) {
+                    requireActivity().runOnUiThread {
+                        Toast.makeText(
+                            requireContext(),
+                            if (ok) R.string.ha_sync_done else R.string.ha_sync_failed,
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        refreshHaStatus()
+                    }
+                }
+            }.start()
+        }
+        refreshHaStatus()
         loadProfile()
+    }
+
+    private fun saveHaSettings() {
+        SyncManager.saveSettings(
+            requireContext(),
+            binding.switchHa.isChecked,
+            binding.edtHaUrl.text?.toString().orEmpty(),
+            binding.edtHaToken.text?.toString().orEmpty()
+        )
+    }
+
+    private fun refreshHaStatus() {
+        binding.txtHaStatus.text = SyncManager.statusText(requireContext())
     }
 
     private fun loadProfile() {

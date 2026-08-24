@@ -7,7 +7,8 @@ import com.example.healthmonitor.data.ProfileStore
 import com.example.healthmonitor.data.StatsStore
 import com.example.healthmonitor.data.UserProfile
 import com.example.healthmonitor.sensor.StepTracker
-import java.time.LocalDate
+import com.example.healthmonitor.sync.SyncManager
+import com.example.healthmonitor.sync.SyncScheduler
 
 class HealthApp : Application() {
 
@@ -19,6 +20,10 @@ class HealthApp : Application() {
     override fun onCreate() {
         super.onCreate()
         SedentaryReminder.rescheduleIfEnabled(this)
+        if (SyncManager.isEnabled(this)) {
+            SyncScheduler.reschedule(this)
+            Thread { SyncManager.syncNow(this) }.start()
+        }
         migrateLegacyPrefs()
     }
 
@@ -35,10 +40,6 @@ class HealthApp : Application() {
             }
             statsPrefs.getStringSet("achievements", emptySet())?.forEach {
                 healthDatabase.earnAchievement(it)
-            }
-            val lastHr = statsPrefs.getInt("last_hr", 0)
-            if (lastHr > 0) {
-                healthDatabase.recordHeartRate(LocalDate.now().toString(), lastHr)
             }
             statsPrefs.edit().putBoolean("legacy_migrated", true).apply()
         }

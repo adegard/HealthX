@@ -53,9 +53,8 @@ class HistoryFragment : Fragment() {
             val calories = TargetsCalculator.calories(stat.steps.toInt(), profile)
             row.txtDate.text = formatDate(stat.date)
             row.txtSteps.text = String.format(Locale.US, "%,d", stat.steps)
-            val hrText = if (stat.avgHr > 0) " · HR ${stat.avgHr}" else ""
             row.txtMetrics.text = String.format(
-                Locale.US, "%.2f km · %.0f kcal%s", distance, calories, hrText
+                Locale.US, "%.2f km · %.0f kcal", distance, calories
             )
             binding.listLayout.addView(row.root)
         }

@@ -73,9 +73,8 @@ class DashboardFragment : Fragment(), StepTracker.Listener {
         val calories = TargetsCalculator.calories(steps.toInt(), profile)
         val minutes = TargetsCalculator.activeMinutes(steps.toInt())
         val bmi = TargetsCalculator.bmi(profile)
-        val lastHr = main.statsStore.lastHeartRate()
 
-        Achievements.checkAndEarn(main.statsStore, steps, distance, calories, bmi, hrRead = false)
+        Achievements.checkAndEarn(main.statsStore, steps, distance, calories, bmi)
 
         binding.textSteps.text = String.format(Locale.US, "%,d", steps)
         binding.progressGoal.max = goal
@@ -84,7 +83,6 @@ class DashboardFragment : Fragment(), StepTracker.Listener {
         binding.textDistance.text = String.format(Locale.US, "%.2f km", distance)
         binding.textCalories.text = String.format(Locale.US, "%.0f kcal", calories)
         binding.textMinutes.text = getString(R.string.minutes_value, minutes)
-        binding.textHr.text = if (lastHr > 0) getString(R.string.bpm_value, lastHr) else "--"
         binding.textBmi.text = String.format(Locale.US, "%.1f", bmi)
 
         val zones = TargetsCalculator.heartRateZones(profile.age)
