@@ -17,7 +17,7 @@ A privacy-friendly Android step tracker that runs entirely on the phone — no w
 | Wellness | Sedentary reminders (optional notifications to stand up and move), walking advice, a 5-minute morning routine and gentle no-equipment exercises for skeleton and muscle |
 | Backup | Export the whole SQLite database to a file (SAF) and restore it later or on another device |
 | Background | Foreground service keeps the step counter alive in the background and flushes data to SQLite every 30 s (battery-friendly) |
-| Home Assistant | Daily push of each day's steps/distance/calories as `sensor.healthx_steps_YYYY_MM_DD`; retries while away and catches up on missed days |
+| Home Assistant | Single sensor `sensor.healthx_steps` (state = latest day, `history` attribute = every day); retries while away and catches up missed days |
 
 ## Data & privacy
 
@@ -29,9 +29,9 @@ A privacy-friendly Android step tracker that runs entirely on the phone — no w
 
 1. In Home Assistant, click your username → **Security** → **Long-lived access tokens** → **Create token** and copy it.
 2. In the app: **Profile → Home Assistant sync**, enter your server URL (e.g. `http://192.168.8.17:8123`) and the token, then enable the switch.
-3. The app creates/updates one entity per day, e.g. `sensor.healthx_steps_2026_08_24`, with the step count as state and `distance_km` / `calories` / `date` as attributes.
+3. The app maintains ONE entity: `sensor.healthx_steps`. Its state is the latest day's step count; attributes include `date`, `distance_km`, `calories` and a `history` map (`{"2026-08-24": 7796, ...}`) with the last 30 days. Opening the app also refreshes the sensor.
 
-**How it works:** shortly after midnight a daily alarm fires. If the phone is on Wi-Fi, every day that has not been synced yet is sent to Home Assistant (one entity per day). If Wi-Fi is unavailable — for example you are away — the app retries every 30 minutes and catches up later, so skipped days are not lost: when you are back home each missing day is registered separately under its own date.
+**How it works:** shortly after midnight a daily alarm fires. If the phone is on Wi-Fi, the sensor is updated with all data that has not been sent yet (older versions created one entity per day; those are deleted automatically). If Wi-Fi is unavailable — for example you are away — the app retries every 30 minutes and catches up later, so skipped days are not lost: when you are back home each missing day appears in the history attribute under its own date.
 
 ## Permissions
 

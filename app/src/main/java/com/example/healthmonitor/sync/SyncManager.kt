@@ -6,7 +6,6 @@ import android.net.NetworkCapabilities
 import com.example.healthmonitor.HealthApp
 import com.example.healthmonitor.R
 import com.example.healthmonitor.data.TargetsCalculator
-import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -21,7 +20,11 @@ object SyncManager {
     private const val KEY_TOKEN = "token"
     private const val KEY_LAST_SYNC_AT = "last_sync_at"
     private const val KEY_LAST_ERROR = "last_error"
-    private const val ENTITY_PREFIX = "sensor.healthx_steps_"
+    private const val KEY_LEGACY_CLEANED = "legacy_per_day_cleaned"
+
+    const val ENTITY_ID = "sensor.healthx_steps"
+    private const val LEGACY_PREFIX = "sensor.healthx_steps_"
+    private const val HISTORY_DAYS = 30
 
     fun isEnabled(context: Context): Boolean =
         prefs(context).getBoolean(KEY_ENABLED, false)
@@ -43,7 +46,8 @@ object SyncManager {
 
     fun statusText(context: Context): String {
         val app = context.applicationContext as HealthApp
-        val pending = app.statsStore.countUnsynced()
+        val today = todayKey()
+        val pending = app.statsStore.getUnsyncedDates(60).count { it != today }
         val prefs = prefs(context)
         val lastAt = prefs.getLong(KEY_LAST_SYNC_AT, 0L)
         val lastError = prefs.getString(KEY_LAST_ERROR, null)
@@ -58,7 +62,7 @@ object SyncManager {
         return parts.joinToString("\n")
     }
 
-    fun syncNow(context: Context): Boolean {
+    fun syncNow(context: Context, force: Boolean = false): Boolean {
         val appContext = context.applicationContext
         if (!isEnabled(appContext)) return false
         val baseUrl = url(appContext)
@@ -73,32 +77,43 @@ object SyncManager {
 
         val app = appContext as HealthApp
         val profile = app.profileStore.load()
-        var allOk = true
 
-        for (date in app.statsStore.getUnsyncedDates(60)) {
-            val steps = app.statsStore.getStepsFor(date)
-            val entityId = ENTITY_PREFIX + date.replace("-", "_")
+        var allOk = true
+        try {
+            val rows = app.statsStore.getHistory(HISTORY_DAYS).reversed()
+            if (rows.isEmpty()) return true
+
+            val latest = rows.last()
+            val latestSteps = latest.steps.toInt()
+            val history = linkedMapOf<String, Any>()
+            rows.forEach { row -> history[row.date] = row.steps }
+
             val attributes = linkedMapOf<String, Any?>(
-                "date" to date,
-                "distance_km" to TargetsCalculator.distanceKm(steps.toInt(), profile),
-                "calories" to TargetsCalculator.calories(steps.toInt(), profile),
-                "friendly_name" to "HealthX steps $date"
+                "friendly_name" to "HealthX steps",
+                "icon" to "mdi:foot-print",
+                "unit_of_measurement" to "steps",
+                "date" to latest.date,
+                "distance_km" to TargetsCalculator.distanceKm(latestSteps, profile),
+                "calories" to TargetsCalculator.calories(latestSteps, profile),
+                "history" to history
             )
-            allOk = try {
-                HomeAssistantClient.sendState(
-                    baseUrl,
-                    authToken,
-                    entityId,
-                    steps.toString(),
-                    attributes
-                )
-                app.statsStore.markSynced(date)
-                true
-            } catch (e: Exception) {
-                setLastError(appContext, e.message ?: e.javaClass.simpleName)
-                false
+            HomeAssistantClient.sendState(
+                baseUrl,
+                authToken,
+                ENTITY_ID,
+                latestSteps.toString(),
+                attributes
+            )
+
+            val today = todayKey()
+            app.statsStore.getUnsyncedDates(60).forEach { date ->
+                if (date != today) app.statsStore.markSynced(date)
             }
-            if (!allOk) break
+
+            cleanupLegacySensors(app, baseUrl, authToken)
+        } catch (e: Exception) {
+            setLastError(appContext, e.message ?: e.javaClass.simpleName)
+            allOk = false
         }
 
         if (allOk) {
@@ -111,6 +126,30 @@ object SyncManager {
         }
         return allOk
     }
+
+    private fun cleanupLegacySensors(app: HealthApp, baseUrl: String, authToken: String) {
+        val prefs = prefs(app)
+        if (prefs.getBoolean(KEY_LEGACY_CLEANED, false)) return
+        try {
+            app.statsStore.getHistory(730).forEach { row ->
+                val legacyId = LEGACY_PREFIX + row.date.replace("-", "_")
+                try {
+                    HomeAssistantClient.deleteState(baseUrl, authToken, legacyId)
+                } catch (e: Exception) {
+                    if (e is java.io.IOException && e.message?.contains("404") == true) {
+                        // entity never existed or already gone
+                    } else {
+                        throw e
+                    }
+                }
+            }
+            prefs.edit().putBoolean(KEY_LEGACY_CLEANED, true).apply()
+        } catch (e: Exception) {
+            // retry on next successful sync
+        }
+    }
+
+    private fun todayKey(): String = java.time.LocalDate.now().toString()
 
     private fun setLastError(context: Context, message: String) {
         prefs(context).edit().putString(KEY_LAST_ERROR, message).apply()

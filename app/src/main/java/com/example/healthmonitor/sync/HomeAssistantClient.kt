@@ -40,4 +40,21 @@ object HomeAssistantClient {
             connection?.disconnect()
         }
     }
+
+    fun deleteState(baseUrl: String, token: String, entityId: String) {
+        var connection: HttpURLConnection? = null
+        try {
+            connection = URL("$baseUrl/api/states/$entityId").openConnection() as HttpURLConnection
+            connection.requestMethod = "DELETE"
+            connection.connectTimeout = 10_000
+            connection.readTimeout = 10_000
+            connection.setRequestProperty("Authorization", "Bearer $token")
+            val code = connection.responseCode
+            if (code !in 200..299 && code != 404) {
+                throw IOException("Home Assistant responded with HTTP $code")
+            }
+        } finally {
+            connection?.disconnect()
+        }
+    }
 }

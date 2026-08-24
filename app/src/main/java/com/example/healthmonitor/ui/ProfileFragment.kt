@@ -90,7 +90,7 @@ class ProfileFragment : Fragment() {
             Toast.makeText(requireContext(), R.string.ha_syncing, Toast.LENGTH_SHORT).show()
             val appContext = requireContext().applicationContext
             Thread {
-                val ok = SyncManager.syncNow(appContext)
+                val ok = SyncManager.syncNow(appContext, force = true)
                 if (isAdded()) {
                     requireActivity().runOnUiThread {
                         Toast.makeText(

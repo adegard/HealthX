@@ -72,7 +72,7 @@
     <string name="backup_restore_failed">Restore failed</string>
 
     <string name="ha_title">Home Assistant sync</string>
-    <string name="ha_hint">Once a day (after midnight) your step history is sent to Home Assistant over your home Wi-Fi. Missed days are sent automatically when you are back home.</string>
+    <string name="ha_hint">Your step history is synced once a day (after midnight, on home Wi-Fi) into one sensor: sensor.healthx_steps — state is today\'s steps and the history attribute holds every day. Missed days catch up automatically when you are back home.</string>
     <string name="ha_server_url">Server URL</string>
     <string name="ha_token">Long-lived access token</string>
     <string name="ha_enable_label">Enable daily sync</string>

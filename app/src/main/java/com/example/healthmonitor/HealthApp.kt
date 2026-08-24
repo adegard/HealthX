@@ -22,7 +22,7 @@ class HealthApp : Application() {
         SedentaryReminder.rescheduleIfEnabled(this)
         if (SyncManager.isEnabled(this)) {
             SyncScheduler.reschedule(this)
-            Thread { SyncManager.syncNow(this) }.start()
+            Thread { SyncManager.syncNow(this, force = true) }.start()
         }
         migrateLegacyPrefs()
     }
