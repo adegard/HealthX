@@ -29,7 +29,7 @@ object HomeAssistantClient {
             connection.setRequestProperty("Authorization", "Bearer $token")
             connection.setRequestProperty("Content-Type", "application/json")
             connection.outputStream.use { out ->
-                out.write(payload.toByteArray(Charsets.UTF_8))
+                out.write(payload.toString().toByteArray(Charsets.UTF_8))
                 out.flush()
             }
             val code = connection.responseCode
