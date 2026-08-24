@@ -7,6 +7,14 @@ import java.net.URL
 
 object HomeAssistantClient {
 
+    private fun errorBody(connection: HttpURLConnection): String {
+        return try {
+            connection.errorStream?.bufferedReader()?.use { it.readText() }?.take(300) ?: ""
+        } catch (e: Exception) {
+            ""
+        }
+    }
+
     fun sendState(
         baseUrl: String,
         token: String,
@@ -62,7 +70,7 @@ object HomeAssistantClient {
             }
             val code = connection.responseCode
             if (code !in 200..299) {
-                throw IOException("Home Assistant responded with HTTP $code")
+                throw IOException("HTTP $code: ${errorBody(connection)}")
             }
         } finally {
             connection?.disconnect()

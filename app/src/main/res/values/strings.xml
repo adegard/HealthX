@@ -79,7 +79,8 @@
     <string name="ha_sync_now">Sync now</string>
     <string name="ha_syncing">Syncing…</string>
     <string name="ha_sync_done">Sync finished</string>
-    <string name="ha_sync_failed">Sync failed — check server URL and token</string>
+    <string name="ha_sync_failed">Sync failed</string>
+    <string name="ha_stats_warning">Steps synced, but statistics import failed: %1$s</string>
     <string name="ha_pending">Days waiting to sync: %1$d</string>
     <string name="ha_last_sync">Last sync: %1$s</string>
     <string name="ha_waiting_wifi">Waiting for home Wi-Fi…</string>

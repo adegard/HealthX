@@ -105,7 +105,12 @@ object SyncManager {
                 attributes
             )
 
-            importDailyStatistics(baseUrl, authToken, rows)
+            var warning: String? = null
+            try {
+                importDailyStatistics(baseUrl, authToken, rows)
+            } catch (e: Exception) {
+                warning = appContext.getString(R.string.ha_stats_warning, e.message ?: "?")
+            }
 
             val today = todayKey()
             app.statsStore.getUnsyncedDates(60).forEach { date ->
@@ -113,19 +118,18 @@ object SyncManager {
             }
 
             cleanupLegacySensors(app, baseUrl, authToken)
+
+            prefs(appContext).edit()
+                .putLong(KEY_LAST_SYNC_AT, System.currentTimeMillis())
+                .putString(KEY_LAST_ERROR, warning)
+                .apply()
+            return true
         } catch (e: Exception) {
             setLastError(appContext, e.message ?: e.javaClass.simpleName)
             allOk = false
         }
 
-        if (allOk) {
-            prefs(appContext).edit()
-                .putLong(KEY_LAST_SYNC_AT, System.currentTimeMillis())
-                .putString(KEY_LAST_ERROR, null)
-                .apply()
-        } else {
-            SyncScheduler.scheduleRetry(appContext)
-        }
+        SyncScheduler.scheduleRetry(appContext)
         return allOk
     }
 

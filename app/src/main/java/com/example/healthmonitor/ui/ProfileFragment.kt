@@ -93,12 +93,11 @@ class ProfileFragment : Fragment() {
                 val ok = SyncManager.syncNow(appContext, force = true)
                 if (isAdded()) {
                     requireActivity().runOnUiThread {
-                        Toast.makeText(
-                            requireContext(),
-                            if (ok) R.string.ha_sync_done else R.string.ha_sync_failed,
-                            Toast.LENGTH_SHORT
-                        ).show()
                         refreshHaStatus()
+                        val message = if (ok) getString(R.string.ha_sync_done)
+                        else binding.txtHaStatus.text.toString()
+                            .ifBlank { getString(R.string.ha_sync_failed) }
+                        Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
                     }
                 }
             }.start()
