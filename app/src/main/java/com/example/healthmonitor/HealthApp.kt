@@ -21,7 +21,7 @@ class HealthApp : Application() {
         super.onCreate()
         SedentaryReminder.rescheduleIfEnabled(this)
         if (SyncManager.isEnabled(this)) {
-            SyncScheduler.reschedule(this)
+            SyncScheduler.schedule(this)
             Thread { SyncManager.syncNow(this, force = true) }.start()
         }
         migrateLegacyPrefs()

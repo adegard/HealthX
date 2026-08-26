@@ -43,7 +43,7 @@ object SyncManager {
             .putString(KEY_URL, url.trim().trimEnd('/'))
             .putString(KEY_TOKEN, token.trim())
             .apply()
-        if (enabled) SyncScheduler.reschedule(context) else SyncScheduler.cancel(context)
+        if (enabled) SyncScheduler.schedule(context) else SyncScheduler.cancel(context)
     }
 
     fun statusText(context: Context): String {

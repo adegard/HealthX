@@ -46,10 +46,6 @@
             android:exported="false" />
 
         <receiver
-            android:name=".sync.DailySyncReceiver"
-            android:exported="false" />
-
-        <receiver
             android:name=".sync.BootReceiver"
             android:exported="false">
             <intent-filter>

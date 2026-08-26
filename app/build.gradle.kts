@@ -11,8 +11,8 @@ android {
         applicationId = "com.example.healthmonitor"
         minSdk = 26
         targetSdk = 34
-        versionCode = 9
-        versionName = "1.4.3"
+        versionCode = 10
+        versionName = "1.4.4"
     }
 
     buildTypes {
@@ -45,4 +45,5 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
+    implementation("androidx.work:work-runtime-ktx:2.10.0")
 }
