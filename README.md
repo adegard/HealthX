@@ -101,3 +101,7 @@ app/src/main/java/com/example/healthmonitor/
 ## Disclaimer
 
 Heart rate zones shown on the dashboard are estimates computed from age for wellness tracking only. This app is not a medical device and must not be used to diagnose, treat or monitor medical conditions.
+
+---
+
+For an overview of all my other projects, see https://adegard.github.io/blog/
