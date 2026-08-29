@@ -6,6 +6,12 @@ A privacy-friendly Android step tracker that runs entirely on the phone — no w
 - **Targets & achievements** are computed from age, sex, height, weight and activity level: daily step goal, stride length, distance, calories, BMI, max heart rate (208 − 0.7 × age) and heart rate zones.
 - **Home Assistant sync** (optional) pushes each day's progress to your own Home Assistant instance once per day over your home Wi-Fi.
 
+## Screenshots
+
+|  |  |
+| --- | --- |
+| <img src="screenshots/dashboard.png" width="280" alt="Dashboard"> | <img src="screenshots/profile.png" width="280" alt="Profile"> |
+
 ## Features
 
 | Area | Details |
@@ -31,7 +37,7 @@ A privacy-friendly Android step tracker that runs entirely on the phone — no w
 2. In the app: **Profile → Home Assistant sync**, enter your server URL (e.g. `http://192.168.8.17:8123`) and the token, then enable the switch.
 3. The app maintains ONE entity: `sensor.healthx_steps`. Its state is the latest day's step count; attributes include `date`, `distance_km`, `calories` and a `history` map (`{"2026-08-24": 7796, ...}`) with the last 30 days. Opening the app also refreshes the sensor.
 
-**How it works:** shortly after midnight a daily alarm fires. If the phone is on Wi-Fi, the sensor is updated with all data that has not been sent yet (older versions created one entity per day; those are deleted automatically). If Wi-Fi is unavailable — for example you are away — the app retries every 30 minutes and catches up later, so skipped days are not lost: when you are back home each missing day appears in the history attribute under its own date.
+**How it works:** a daily WorkManager job runs on connected Wi-Fi and updates the sensor with all data that has not been sent yet (older versions created one entity per day; those are deleted automatically). If Wi-Fi is unavailable — for example you are away — the app retries every 30 minutes and catches up later, so skipped days are not lost: when you are back home each missing day appears in the history attribute under its own date.
 
 **Past days / statistics:** besides the state update, every sync also imports all days into Home Assistant's long-term statistics via `recorder.import_statistics` (`statistic_id: sensor.healthx_steps`, source `healthx`). That means past days show up immediately: check **Developer tools → Statistics**, add a **Statistics Graph** card (period: day), or open the entity's more-info dialog.
 
@@ -45,7 +51,7 @@ A privacy-friendly Android step tracker that runs entirely on the phone — no w
 
 - Kotlin, Android Gradle Plugin 8.2.2, Gradle 8.2
 - `minSdk 26` (Android 8.0), `targetSdk 34` (Android 14)
-- ViewBinding, CameraX, Material 3
+- ViewBinding, Material 3, WorkManager
 
 Build a debug APK:
 
@@ -64,7 +70,7 @@ app/src/main/java/com/example/healthmonitor/
 ├── HealthApp.kt             # Application; DB-backed singletons + legacy prefs migration
 ├── data/                    # SQLite layer, stores, calculations, achievements
 │   ├── HealthDatabase.kt    # SQLiteOpenHelper: daily_stats, achievements, profile
-│   ├── StatsStore.kt        # Steps / HR / history / backup
+│   ├── StatsStore.kt        # Steps / history / backup
 │   ├── ProfileStore.kt      # User profile
 │   ├── TargetsCalculator.kt # Goals, stride, distance, calories, BMI, HR zones
 │   ├── Achievements.kt      # Badge definitions + check/earn logic
@@ -77,9 +83,9 @@ app/src/main/java/com/example/healthmonitor/
 │   └── SedentaryReminderReceiver.kt # Moves-you reminder notification
 ├── sync/
 │   ├── SyncManager.kt       # Catch-up logic: sends every unsynced day over Wi-Fi
-│   ├── SyncScheduler.kt     # Daily ~00:15 alarm + retry alarm
-│   ├── DailySyncReceiver.kt # Fires the sync from alarms
-│   ├── BootReceiver.kt      # Re-arms alarms after reboot
+│   ├── SyncScheduler.kt     # WorkManager: daily periodic sync + 30 min retry
+│   ├── SyncWorker.kt        # Worker that performs one sync
+│   ├── BootReceiver.kt      # Re-arms WorkManager + sedentary alarms after reboot
 │   └── HomeAssistantClient.kt # REST POST /api/states/<entity>
 └── ui/
     ├── DashboardFragment.kt
@@ -92,4 +98,4 @@ app/src/main/java/com/example/healthmonitor/
 
 ## Disclaimer
 
-Heart rate values are estimates for wellness tracking only. This app is not a medical device and must not be used to diagnose, treat or monitor medical conditions.
+Heart rate zones shown on the dashboard are estimates computed from age for wellness tracking only. This app is not a medical device and must not be used to diagnose, treat or monitor medical conditions.
