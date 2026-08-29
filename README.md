@@ -1,3 +1,5 @@
+[![Buy me a coffee](https://cdn.buymeacoffee.com/buttons/v2/default-red.png)](https://www.buymeacoffee.com/adegard)
+
 # Health Monitor
 
 A privacy-friendly Android step tracker that runs entirely on the phone — no watch, no account, no cloud (optional self-hosted Home Assistant sync).
