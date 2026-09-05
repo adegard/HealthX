@@ -10,6 +10,13 @@
 
     <string name="streak_label">Current streak: %1$d days</string>
 
+    <string name="life_expectancy_title">Life expectancy</string>
+    <string name="life_remaining">%1$dy %2$dd %3$02d:%4$02d:%5$02d</string>
+    <string name="life_basis">Based on ~%1$s steps/day (BMI %2$.1f) → est. lifespan %3$.1f years</string>
+    <string name="life_basis_nodata">Based on age, sex, height and weight → est. lifespan %1$.1f years. Track a few days for a steps-based estimate.</string>
+    <string name="life_detail">Life gained/lost: steps %1$+.1f yrs · BMI %2$+.1f yrs</string>
+    <string name="life_disclaimer">Estimate from your recent habits — not a medical prediction.</string>
+
     <string name="history_title">History</string>
     <string name="history_summary">%1$d days tracked · %2$d total steps · best %3$d</string>
     <string name="history_empty">No data yet. Start moving and check back tomorrow.</string>

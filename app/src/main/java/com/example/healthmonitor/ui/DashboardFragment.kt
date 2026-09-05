@@ -1,6 +1,8 @@
 package com.example.healthmonitor.ui
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,6 +10,7 @@ import androidx.fragment.app.Fragment
 import com.example.healthmonitor.MainActivity
 import com.example.healthmonitor.R
 import com.example.healthmonitor.data.Achievements
+import com.example.healthmonitor.data.LifeExpectancyCalculator
 import com.example.healthmonitor.data.TargetsCalculator
 import com.example.healthmonitor.databinding.FragmentDashboardBinding
 import com.example.healthmonitor.sensor.StepTracker
@@ -21,6 +24,17 @@ class DashboardFragment : Fragment(), StepTracker.Listener {
     private var _binding: FragmentDashboardBinding? = null
     private val binding get() = _binding!!
     private val main get() = requireActivity() as MainActivity
+
+    private val handler = Handler(Looper.getMainLooper())
+    private var remainingSeconds = 0L
+
+    private val ticker = object : Runnable {
+        override fun run() {
+            remainingSeconds = (remainingSeconds - 1).coerceAtLeast(0L)
+            binding.textLifeCountdown.text = formatCountdown(remainingSeconds)
+            handler.postDelayed(this, 1000L)
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -45,11 +59,13 @@ class DashboardFragment : Fragment(), StepTracker.Listener {
             else R.string.sensor_accelerometer
         )
         refresh()
+        handler.post(ticker)
     }
 
     override fun onPause() {
         super.onPause()
         main.stepTracker.listener = null
+        handler.removeCallbacks(ticker)
     }
 
     override fun onStepsChanged(totalToday: Long) {
@@ -92,7 +108,38 @@ class DashboardFragment : Fragment(), StepTracker.Listener {
 
         val streak = Achievements.currentStreak(main.statsStore.getDaysActive())
         binding.textStreak.text = getString(R.string.streak_label, streak)
+
+        val life = LifeExpectancyCalculator.estimate(
+            profile,
+            main.statsStore.getHistory(30)
+        )
+        remainingSeconds = life.remainingSeconds
+        binding.textLifeCountdown.text = formatCountdown(life.remainingSeconds)
+        binding.textLifeDetail.text = getString(
+            R.string.life_detail,
+            life.stepsAdjustment,
+            life.bmiAdjustment
+        )
+        binding.textLifeBasis.text = if (life.hasStepsData) {
+            getString(
+                R.string.life_basis,
+                String.format(Locale.US, "%,d", life.avgDailySteps),
+                life.bmi,
+                life.lifespanYears
+            )
+        } else {
+            getString(R.string.life_basis_nodata, life.lifespanYears)
+        }
     }
+
+    private fun formatCountdown(seconds: Long): String = getString(
+        R.string.life_remaining,
+        seconds / LifeExpectancyCalculator.SECONDS_PER_YEAR,
+        (seconds % LifeExpectancyCalculator.SECONDS_PER_YEAR) / 86_400L,
+        (seconds % 86_400L) / 3_600L,
+        (seconds % 3_600L) / 60L,
+        seconds % 60L
+    )
 
     override fun onDestroyView() {
         super.onDestroyView()
