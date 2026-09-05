@@ -6,6 +6,7 @@ A privacy-friendly Android step tracker that runs entirely on the phone — no w
 
 - **Steps** are counted from the phone's own hardware: the built-in `TYPE_STEP_COUNTER`, with an accelerometer peak-detector fallback on devices that lack one. It never reads steps from a watch.
 - **Targets & achievements** are computed from age, sex, height, weight and activity level: daily step goal, stride length, distance, calories, BMI, max heart rate (208 − 0.7 × age) and heart rate zones.
+- **Life expectancy** is estimated from your age, sex, BMI and your average daily steps, shown as a live countdown ticking down every second.
 - **Home Assistant sync** (optional) pushes each day's progress to your own Home Assistant instance once per day over your home Wi-Fi.
 
 ## Screenshots
@@ -19,6 +20,7 @@ A privacy-friendly Android step tracker that runs entirely on the phone — no w
 | Area | Details |
 | --- | --- |
 | Dashboard | Today's steps, goal progress, distance, calories, active minutes, BMI, HR zones, current streak |
+| Life expectancy | Estimated lifespan from age, sex, BMI and average steps over the last 30 days, displayed as a live second-by-second countdown |
 | Achievements | 11 badges: first steps, 1k / 5k / 10k / 20k steps, 5 km / 10 km, 500 kcal, healthy BMI, 3-day and 7-day streaks |
 | Profile | Age, sex, height, weight, activity level, optional custom step goal; live targets preview |
 | History | Last 60 days in a scrollable list plus a 14-day bar chart, with per-day steps, distance and calories |
@@ -75,6 +77,7 @@ app/src/main/java/com/example/healthmonitor/
 │   ├── StatsStore.kt        # Steps / history / backup
 │   ├── ProfileStore.kt      # User profile
 │   ├── TargetsCalculator.kt # Goals, stride, distance, calories, BMI, HR zones
+│   ├── LifeExpectancyCalculator.kt # Estimated lifespan + habit adjustments
 │   ├── Achievements.kt      # Badge definitions + check/earn logic
 │   └── DailyStat.kt, UserProfile.kt
 ├── sensor/
@@ -100,7 +103,7 @@ app/src/main/java/com/example/healthmonitor/
 
 ## Disclaimer
 
-Heart rate zones shown on the dashboard are estimates computed from age for wellness tracking only. This app is not a medical device and must not be used to diagnose, treat or monitor medical conditions.
+Heart rate zones shown on the dashboard are estimates computed from age for wellness tracking only, and the life-expectancy countdown is a statistical estimate based on your recent habits — improving your steps and BMI genuinely improves it. This app is not a medical device and must not be used to diagnose, treat or monitor medical conditions.
 
 ---
 
